@@ -1,0 +1,7 @@
+fire
+sphinx
+sphinx-autodoc-typehints
+sphinx-autobuild
+myst-parser
+sphinxemoji
+pydata-sphinx-theme
