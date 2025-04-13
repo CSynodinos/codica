@@ -4,6 +4,8 @@ from argparse import Action
 from typing import Callable, Any
 from functools import wraps
 
+FatalError = "Invalid parameters, broken CLI"
+
 
 def Create_Subcommand(subparser: Subparser, name: str, /, **kwargs: Any) -> Subcommand:
     """
@@ -40,9 +42,22 @@ def inputmap[R, **Params](behaviour: Callable[Params, R]) -> Callable[Params, R]
     @wraps(behaviour)
     def wrapper(*args: Params.args, **_: Params.kwargs) -> R:
         codex_params: CodexParams = args[0]
-        assert isinstance(codex_params, CodexParams), RuntimeError("Invalid parameters, broken CLI")
-        applied_kwargs: dict[str, str] = dict(**codex_params)
-        applied_kwargs.pop("command", None)
-        applied_kwargs.pop("func", None)
-        return behaviour(**applied_kwargs)
+        _args: list[str] = []
+        assert isinstance(codex_params, CodexParams), FatalError
+        _kwargs: dict[str, str | list[str]] = dict(**codex_params)
+        _kwargs.pop("command", None)
+        _kwargs.pop("func", None)
+        assert 'command' not in _kwargs, FatalError
+        assert 'func' not in _kwargs, FatalError
+        check = lambda _: type(_) == list
+        match _kwargs:
+            case args_case if 'args' in args_case:
+                match _kwargs.pop('args', None):
+                    case None:                      pass
+                    case str():                     pass
+                    case _match if check(_match):   _args = _match      #? Modify the args to the match
+                    case _:                         raise AssertionError(FatalError)
+            case _:
+                pass
+        return behaviour(*tuple(_args), **_kwargs)
     return wrapper
