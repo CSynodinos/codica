@@ -5,7 +5,7 @@ from typing import Callable, Any
 from functools import wraps
 
 
-FatalError = "Invalid parameters, broken CLI"
+FatalError = "Fatal Error -> Invalid parameters, broken CLI"
 
 
 def Create_Subcommand(subparser: Subparser, name: str, /, **kwargs: Any) -> Subcommand:
