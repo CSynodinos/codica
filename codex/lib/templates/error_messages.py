@@ -1,0 +1,1 @@
+FatalError = "Fatal Error -> Invalid parameters, broken CLI"
