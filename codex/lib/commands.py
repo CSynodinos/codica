@@ -3,9 +3,9 @@ from .utils import inputmap
 
 
 @inputmap
-def create(record: str, set: str) -> None:
+def create(*x, record: str, set: str) -> None:
     """asdasdsdasd"""
-    print(f"Executing 'create' {record} command, setting {set}")
+    print(f"Executing 'create' {record} command, setting {set} to {x}")
 
 
 @inputmap
