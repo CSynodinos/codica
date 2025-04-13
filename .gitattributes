@@ -1,6 +1,1 @@
 * text=auto # Automatically normalize line endings.
-
-# Binary files
-# ============
-*.db     binary
-*.pyc    binary export-ignore
