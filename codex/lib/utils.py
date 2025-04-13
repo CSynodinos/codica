@@ -4,6 +4,7 @@ from argparse import Action
 from typing import Callable, Any
 from functools import wraps
 
+
 FatalError = "Invalid parameters, broken CLI"
 
 
