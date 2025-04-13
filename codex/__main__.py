@@ -1,53 +1,70 @@
 #!/usr/bin/env python3
-from codex.app import *
-from codex.lib import CodexParams
-import argparse
+from argparse import ArgumentParser
+from typing import Any
+import codex.lib as codex
 
 
-def create_parser() -> argparse.ArgumentParser:
+def Codex_App() -> codex.Codex:
     """
+    Create the main parser and subparsers for the CLI application
+    """
+
+    #* Create the main parser & subparsers
+    app = ArgumentParser(prog = "codex", description = "Codex CLI Application")
+    subparsers: codex.Subparser = app.add_subparsers(title = "Commands", dest = "command", required = True)
+
+    #* Create 'create' subcommand and add flags
+    create_subcmd = codex.Create_Subcommand(subparsers, "create", help = "Create a new item")
+    codex.Add_Argument(create_subcmd, "--record", required = True, help = "Record identifier")
+    codex.Add_Argument(create_subcmd, "--set", required = True, help = "Name of the item")
+
+    #* Update subcommand and add flags
+    update_subcmd = codex.Create_Subcommand(subparsers, "update", help = "Update an item")
     
-    """
 
-    #* Create the main parser
-    parser = argparse.ArgumentParser(prog = "codex", description = "Codex CLI Application")
-    subparsers = parser.add_subparsers(title = "Commands", dest = "command", required = True)
+    #* Delete subcommand and add flags
+    delete_subcmd = codex.Create_Subcommand(subparsers, "delete", help = "Delete an item")
+    
 
-    #* Create subcommand
-    parser_create = subparsers.add_parser("create", help = "Create a new item")
-    parser_create.set_defaults(func = create)
 
-    #* Update subcommand
-    parser_update = subparsers.add_parser("update", help = "Update an existing item")
-    parser_update.set_defaults(func = update)
+    #* Deploy subcommand and add flags
+    deploy_subcmd = codex.Create_Subcommand(subparsers, "deploy", help = "Deploy your project")
+    
 
-    #* Delete subcommand
-    parser_delete = subparsers.add_parser("delete", help = "Delete an item")
-    parser_delete.set_defaults(func = delete)
+    #* Pack subcommand and add flags
+    pack_subcmd = codex.Create_Subcommand(subparsers, "pack", help = "Pack resources")
+    
 
-    #* Deploy subcommand
-    parser_deploy = subparsers.add_parser("deploy", help = "Deploy your application")
-    parser_deploy.set_defaults(func = deploy)
+    #* Unpack subcommand and add flags
+    unpack_subcmd = codex.Create_Subcommand(subparsers, "unpack", help = "Unpack resources")
+    
 
-    #* Pack subcommand
-    parser_pack = subparsers.add_parser("pack", help = "Pack resources")
-    parser_pack.set_defaults(func = pack)
+    #* Build subcommand and add flags
+    build_subcmd = codex.Create_Subcommand(subparsers, "build", help = "Build your project")
+    
 
-    #* Unpack subcommand
-    parser_unpack = subparsers.add_parser("unpack", help = "Unpack resources")
-    parser_unpack.set_defaults(func = unpack)
+    #* Bootstrap the subcommands with behaviours
+    Behaviours_and_Subcommands: list[tuple[codex.Behaviour, codex.Subcommand]] = [
+        (codex.create, create_subcmd),
+        (codex.update, update_subcmd),
+        (codex.delete, delete_subcmd),
+        (codex.deploy, deploy_subcmd),
+        (codex.pack, pack_subcmd),
+        (codex.unpack, unpack_subcmd),
+        (codex.build, build_subcmd)
+        ]
 
-    #* Build subcommand
-    parser_build = subparsers.add_parser("build", help = "Build your project")
-    parser_build.set_defaults(func = build)
+    #* Set the behaviours for each subcommand
+    for behaviour, subcommand in Behaviours_and_Subcommands:
+        codex.Set_Behaviour(behaviour, subcommand)
 
-    return parser
+    return app
 
 
 def main() -> None:
-    parser = create_parser()
-    args = CodexParams(**vars(parser.parse_args()))
-    return args.func(args)
+    app = Codex_App()
+    cli_params: dict[str, Any] = vars(app.parse_args())
+    return codex.Run(codex.CodexParams(**cli_params))
 
 
 if __name__ == '__main__':
