@@ -15,7 +15,8 @@ def Codex_App() -> codex.Codex:
     create_subcmd = codex.Create_Subcommand(subparsers, "create", help = "Create a new item")
     codex.Add_Argument(create_subcmd, "--record", required = True, help = "Record identifier")
     codex.Add_Argument(create_subcmd, "--set", required = True, help = "Name of the item")
-
+    codex.Add_Argument(create_subcmd, "args", nargs = "*", help = "Arguments to pass to the command")
+    
     update_subcmd = codex.Create_Subcommand(subparsers, "update", help = "Update an item")
     
 
