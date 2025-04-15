@@ -13,9 +13,9 @@ def Codex_App() -> codex.Codex:
     subparsers: codex.Subparser = app.add_subparsers(title = "Commands", dest = "command", required = True)
 
     create_subcmd = codex.Create_Subcommand(subparsers, "create", help = "Create a new item")
-    codex.Add_Argument(create_subcmd, "--record", required = True, help = "Record identifier")
-    codex.Add_Argument(create_subcmd, "--set", required = True, help = "Name of the item")
-    codex.Add_Argument(create_subcmd, "args", nargs = "*", help = "Arguments to pass to the command")
+    codex.Add_Argument(create_subcmd, "directory", nargs = "*", help = "Arguments to pass to the command")
+    codex.Add_Argument(create_subcmd, "--outdir", "-o", help = "Output directory", default = "docs")
+    
     
     update_subcmd = codex.Create_Subcommand(subparsers, "update", help = "Update an item")
     
@@ -25,7 +25,8 @@ def Codex_App() -> codex.Codex:
 
 
     deploy_subcmd = codex.Create_Subcommand(subparsers, "deploy", help = "Deploy your project")
-    
+    codex.Add_Argument(deploy_subcmd, "directory", nargs = "*", help = "Arguments to pass to the command", default = ["docs",])
+    codex.Add_Argument(deploy_subcmd, "--port", "-p", help = "Port to use", default = "8000")
 
     pack_subcmd = codex.Create_Subcommand(subparsers, "pack", help = "Pack resources")
     
