@@ -11,24 +11,22 @@ def _inputmap[R, **Params](behaviour: Callable[Params, R]) -> Callable[Params, R
     @wraps(behaviour)
     def wrapper(*args: Params.args, **_: Params.kwargs) -> R:
         codex_params: CodexParams = args[0]
-        _args: list[str] = []
+        _applied_args: list[str] = []
         assert isinstance(codex_params, CodexParams), FatalError
-        _kwargs: dict[str, str | list[str]] = dict(**codex_params)
-        _kwargs.pop("command", None)
-        _kwargs.pop("func", None)
-        assert 'command' not in _kwargs, FatalError
-        assert 'func' not in _kwargs, FatalError
-        check = lambda _: type(_) == list
-        match _kwargs:
+        _applied_kwargs: dict[str, str | list[str]] = dict(**codex_params)
+        _applied_kwargs.pop("command", None)
+        _applied_kwargs.pop("func", None)
+        assert 'command' not in _applied_kwargs, FatalError
+        assert 'func' not in _applied_kwargs, FatalError
+        is_list = lambda _: isinstance(_, list)
+        match _applied_kwargs:
             case args_case if 'args' in args_case:
-                match _kwargs.pop('args', None):
-                    case None:                      pass
-                    case str():                     pass
-                    case _match if check(_match):   _args = _match      #? Modify the args to the match
-                    case _:                         raise AssertionError(FatalError)
-            case _:
-                pass
-        return behaviour(*tuple(_args), **_kwargs)
+                match _applied_kwargs.pop('args', None):
+                    case None:                        pass
+                    case str():                       pass
+                    case _match if is_list(_match):   _applied_args = _match
+                    case _:                           raise AssertionError(FatalError)
+        return behaviour(*tuple(_applied_args), **_applied_kwargs)
     return wrapper
 
 
