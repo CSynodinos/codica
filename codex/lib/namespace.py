@@ -11,22 +11,21 @@ def _inputmap[R, **Params](behaviour: Callable[Params, R]) -> Callable[Params, R
     @wraps(behaviour)
     def wrapper(*args: Params.args, **_: Params.kwargs) -> R:
         codex_params: CodexParams = args[0]
-        _applied_args: list[str] = []
+        applied_args: list[str] = []
         assert isinstance(codex_params, CodexParams), FatalError
-        _applied_kwargs: dict[str, str | list[str]] = dict(**codex_params)
-        _applied_kwargs.pop("command", None)
-        _applied_kwargs.pop("func", None)
-        assert 'command' not in _applied_kwargs, FatalError
-        assert 'func' not in _applied_kwargs, FatalError
-        is_list = lambda _: isinstance(_, list)
-        match _applied_kwargs:
-            case args_case if 'args' in args_case:
-                match _applied_kwargs.pop('args', None):
-                    case None:                        pass
-                    case str():                       pass
-                    case _match if is_list(_match):   _applied_args = _match
-                    case _:                           raise AssertionError(FatalError)
-        return behaviour(*tuple(_applied_args), **_applied_kwargs)
+        _extracted_kwargs: dict[str, str | list[str]] = dict(**codex_params)
+        _extracted_kwargs.pop("command", None)
+        _extracted_kwargs.pop("func", None)
+        assert 'command' not in _extracted_kwargs, FatalError
+        assert 'func' not in _extracted_kwargs, FatalError
+        applied_kwargs: dict[str, str] = {}
+        for k, v in _extracted_kwargs.items():
+            match v:
+                case list():
+                    applied_args.extend(v)
+                case _:
+                    applied_kwargs[k] = v
+        return behaviour(*tuple(applied_args), **applied_kwargs)
     return wrapper
 
 
