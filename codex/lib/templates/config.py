@@ -5,6 +5,7 @@ SPHINX_CONFIG_TEMPLATE = '''\
 
 import os
 import sys
+import types
 sys.path.append(os.getcwd())
 
 # -- Project information -----------------------------------------------------
@@ -51,4 +52,5 @@ html_theme_options = {
     "show_nav_level": 2,
     "show_toc_level": 6,
 }
+
 '''
