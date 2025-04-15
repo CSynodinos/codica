@@ -2,6 +2,7 @@ fire
 sphinx
 sphinx-autodoc-typehints
 sphinx-autobuild
+sphinx_copybutton
 myst-parser
 sphinxemoji
 pydata-sphinx-theme
