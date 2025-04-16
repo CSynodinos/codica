@@ -4,6 +4,23 @@ from argparse import Namespace
 from functools import wraps
 
 
+class CodexParams(Namespace):
+    func: Callable[[Self], Any]
+
+    def keys(self) -> list[str]:
+        return [key for key in self.__dict__.keys() if not key.startswith("_")]
+
+    def __getitem__(self, key: str) -> Any:
+        return getattr(self, key)
+
+    def __getattribute__(self, name: str) -> Any:
+        match name:
+            case "func":
+                return _inputmap(super().__getattribute__(name))
+            case _:
+                return super().__getattribute__(name)
+
+
 def _inputmap[R, **Params](behaviour: Callable[Params, R]) -> Callable[Params, R]:
     """
     Decorator to match the type of the function
@@ -27,20 +44,3 @@ def _inputmap[R, **Params](behaviour: Callable[Params, R]) -> Callable[Params, R
                     applied_kwargs[k] = v
         return behaviour(*tuple(applied_args), **applied_kwargs)
     return wrapper
-
-
-class CodexParams(Namespace):
-    func: Callable[[Self], Any]
-
-    def keys(self) -> list[str]:
-        return [key for key in self.__dict__.keys() if not key.startswith("_")]
-
-    def __getitem__(self, key: str) -> Any:
-        return getattr(self, key)
-
-    def __getattribute__(self, name: str) -> Any:
-        match name:
-            case "func":
-                return _inputmap(super().__getattribute__(name))
-            case _:
-                return super().__getattribute__(name)
