@@ -5,42 +5,62 @@ import subprocess
 import re
 
 def create(*directory, outdir: str = 'docs') -> None:
-    """asdasdsdasd"""
+    """
+    
+    """
     assert isinstance(directory, tuple), "directory must be a tuple"
+    if os.path.exists(outdir):
+        raise ValueError(f"Output directory '{outdir}' already exists")
     if len(directory) == 0:
         raise ValueError("No directory provided")
     if len(directory) > 1:
         raise ValueError("Multiple directories provided")
     _directory = directory[0]
     os.makedirs(source_dir := os.path.join(outdir, "source"), exist_ok = True)
-    _create_conf(source_dir)
+    _create_conf(source_dir, outdir)
     _create_custom_css(source_dir)
-    _create_index(source_dir)
+    _create_index(source_dir, outdir)
     _build_doc(_directory, source_dir)
     _build_website(source_dir, outdir)
     return
 
 
-def update() -> None:
-    print("Executing 'update' command")
-
-
-def delete() -> None:
-    print("Executing 'delete' command")
-
-
-def deploy(*directory, port: str = '8000') -> None:
-    python_server = f"python -m http.server {port}"
+def update(*directory,) -> None:
+    """
+    
+    """
     if len(directory) == 0:
         raise ValueError("No directory provided")
     if len(directory) > 1:
         raise ValueError("Multiple directories provided")
-    _directory = os.path.join(directory[0], "_build", "html")
-    print(f"Serving directory '{_directory}' on port {port} using Python HTTP server.")
-    print("Executing command:", python_server)
-    subprocess.run(python_server.split(" "), cwd = _directory)
+    _directory: str = directory[0]
+    assert os.path.exists(_directory), f"Directory '{_directory}' does not exist"
+    print(f"Updating documentation in directory '{_directory}'")
+    subprocess.run(f"sphinx-build -b html -a {os.path.abspath(_directory.replace("_build/html", ""))} docs/_build/html".split(" "))
     return
+
+
+def delete(*directory) -> None:
+    _directory = directory[0]
+    assert os.path.exists(_directory), f"Directory '{_directory}' does not exist"
+    shutil.rmtree(_directory)
+    print(f"Deleted directory '{_directory}'")
+    return
+
+
+def deploy(*directory, port: str = '8000') -> None:
+    """
     
+    """
+    _directory = os.path.join(directory[0], "_build", "html")
+    assert os.path.exists(_directory), f"Directory '{_directory}' does not exist"
+    server_instance: str = f"python -m http.server {port}"
+    if len(directory) == 0:
+        raise ValueError("No directory provided")
+    if len(directory) > 1:
+        raise ValueError("Multiple directories provided")
+    subprocess.run(server_instance.split(" "), cwd = _directory)
+    return
 
 
 def pack() -> None:
@@ -52,17 +72,19 @@ def unpack() -> None:
 
 
 def build() -> None:
+    """Docker image"""
     print("Executing 'build' command")
 
 
-def _create_conf(source_dir: str) -> None:
+def _create_conf(source_dir: str , outdir: str) -> None:
     conf_file_path = os.path.join(source_dir, "conf.py")
     if os.path.exists(conf_file_path):
         print("conf.py already exists at:", conf_file_path)
         return
     with open(conf_file_path, "w", encoding = "utf-8") as f:
         f.write(SPHINX_CONFIG_TEMPLATE)
-    print("Created conf.py at:", conf_file_path)
+    shutil.copy2(conf_file_path, outdir + "/conf.py")
+    print("Created conf.py at:", conf_file_path, "and copied to:", outdir + "/conf.py")
     return
 
 
@@ -159,7 +181,7 @@ def _build_website(source_dir, docs_dir, output_dir = None):
     return
 
 
-def _create_index(source_dir):
+def _create_index(source_dir: str, outdir: str) -> None:
     """
     Create a minimal index.rst file (the master document) in the source directory.
     If index.rst already exists, it won't be overwritten.
@@ -168,8 +190,9 @@ def _create_index(source_dir):
     if os.path.exists(index_file):
         print("index.rst already exists at:", index_file)
         return
-    with open(index_file, "w", encoding="utf-8") as f:
+    with open(index_file, "w", encoding = "utf-8") as f:
         f.write(INDEX)
+    shutil.copy2(index_file, outdir + "/index.rst")
     print("Created index.rst at:", index_file)
     return
 
