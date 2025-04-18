@@ -38,7 +38,7 @@ def _inputmap[R, **Params](behaviour: Callable[Params, R]) -> Callable[Params, R
         applied_kwargs: dict[str, str] = {}
         for k, v in _extracted_kwargs.items():
             match v:
-                case list():
+                case list() | tuple():
                     applied_args.extend(v)
                 case _:
                     applied_kwargs[k] = v
