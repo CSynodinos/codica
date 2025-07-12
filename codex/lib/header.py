@@ -3,7 +3,7 @@ from typing import Callable, Any
 from enum import StrEnum
 
 
-type Codex = ArgumentParser
+type CodexParser = ArgumentParser
 type Subcommand = ArgumentParser
 type Subparser  = _SubParsersAction[ArgumentParser]
 type Behaviour = Callable[..., Any]

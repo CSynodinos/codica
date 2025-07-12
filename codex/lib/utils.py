@@ -1,5 +1,5 @@
 from .header import Subparser, Subcommand, Behaviour
-from .namespace import CodexParams
+from .namespace import CodexCore
 from argparse import Action
 from typing import Any
 
@@ -25,9 +25,10 @@ def Set_Behaviour(behaviour: Behaviour, to_subcommand: Subcommand) -> None:
     return to_subcommand.set_defaults(func = behaviour)
 
 
-def Run(params_table: CodexParams) -> None:
+def Run(params_map: CodexCore) -> Any:
     """
     Run the function with the given parameters.
     """
-    return params_table.func(params_table)
+    func_selected_by_user = params_map.func
+    return func_selected_by_user(params_map)
 

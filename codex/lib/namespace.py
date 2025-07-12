@@ -4,7 +4,7 @@ from argparse import Namespace
 from functools import wraps
 
 
-class CodexParams(Namespace):
+class CodexCore(Namespace):
     func: Callable[[Self], Any]
 
     def keys(self) -> list[str]:
@@ -27,9 +27,9 @@ def _inputmap[R, **Params](behaviour: Callable[Params, R]) -> Callable[Params, R
     """
     @wraps(behaviour)
     def wrapper(*args: Params.args, **_: Params.kwargs) -> R:
-        codex_params: CodexParams = args[0]
+        codex_params: CodexCore = args[0]
         applied_args: list[str] = []
-        assert isinstance(codex_params, CodexParams), FatalError
+        assert isinstance(codex_params, CodexCore), FatalError
         _extracted_kwargs: dict[str, str | list[str]] = dict(**codex_params)
         _extracted_kwargs.pop("command", None)
         _extracted_kwargs.pop("func", None)

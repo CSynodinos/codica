@@ -1,4 +1,3 @@
-fire
 sphinx
 sphinx-autodoc-typehints
 sphinx-autobuild
