@@ -8,6 +8,18 @@ import sys
 import types
 sys.path.append(os.getcwd())
 
+# -- Monkey-patch for Sphinx stringify_annotation bug -------------------------
+# Sphinx can crash with "TypeError: 'NoneType' object cannot be interpreted
+# as an integer" when autodoc encounters objects with a broken __len__/__bool__.
+import sphinx.util.typing as _sphinx_typing
+_orig_stringify = _sphinx_typing.stringify_annotation
+def _safe_stringify(annotation, mode='fully-qualified', short_literals=False):
+    try:
+        return _orig_stringify(annotation, mode=mode, short_literals=short_literals)
+    except TypeError:
+        return repr(annotation)
+_sphinx_typing.stringify_annotation = _safe_stringify
+
 # -- Project information -----------------------------------------------------
 project = 'My Project'
 author = 'Author Name'
@@ -17,13 +29,17 @@ release = '0.1'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.apidoc',
-    'sphinx.ext.napoleon',
     'sphinx.ext.viewcode',
     'myst_parser',
     'sphinx_copybutton',
     'sphinx.ext.autosectionlabel',
     'sphinxemoji.sphinxemoji',
 ]
+
+source_suffix = {
+    '.rst': 'restructuredtext',
+    '.md': 'markdown',
+}
 
 templates_path = ['_templates']
 exclude_patterns = []

@@ -26,13 +26,8 @@ def Create_Codex_Arg_Parser() -> codex.CodexParser:
     codex.Add_Argument(deploy_subcmd, "--port", "-p", help = "Port to use", default = "8000")
 
     pack_subcmd = codex.Create_Subcommand(subparsers, codex.Commands.PACK, help = "Pack resources")
-    
-
     unpack_subcmd = codex.Create_Subcommand(subparsers, codex.Commands.UNPACK, help = "Unpack resources")
-    
-
     build_subcmd = codex.Create_Subcommand(subparsers, codex.Commands.BUILD, help = "Build your project")
-    
 
     #* Associate behaviours with subcommands
     Behaviours_and_Subcommands: list[tuple[codex.Behaviour, codex.Subcommand]] = [
